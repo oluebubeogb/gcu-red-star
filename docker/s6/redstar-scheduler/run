@@ -1,0 +1,7 @@
+#!/command/with-contenv sh
+# redstar scheduler .
+# Disable with REDSTAR_RUN_WORKERS=false (e.g. if you use a Coolify Scheduled Task instead).
+if [ "${REDSTAR_RUN_WORKERS:-true}" != "true" ]; then exec sleep infinity; fi
+sleep "${REDSTAR_WORKER_START_DELAY:-20}"
+cd /var/www/html
+exec php artisan schedule:work
