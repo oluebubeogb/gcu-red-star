@@ -25,6 +25,8 @@ class ProfileUpdateRequest extends FormRequest
             'show_in_directory' => ['boolean'],
             'digest_opt_in' => ['boolean'],
             'notify_email' => ['boolean'],
+            'bio' => ['nullable', 'string', 'max:2000'],
+            'pronouns' => ['nullable', 'string', 'max:30'],
             'email' => [
                 'required',
                 'string',

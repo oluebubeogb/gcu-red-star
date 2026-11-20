@@ -69,14 +69,14 @@ class DashboardController extends Controller
         abort_unless($request->user()->isAdmin() && DemoData::allowed(), 403);
         $count = (int) $request->validate(['count' => ['required', 'integer', 'min:1', 'max:25']])['count'];
         DemoData::seed($count);
-        return back()->with('status', "Seeded {$count} demo members with sample submissions and bookmarks.");
+        return back()->with('status', "Seeded {$count} members and archive content.");
     }
 
     public function purgeDemo(Request $request)
     {
         abort_unless($request->user()->isAdmin() && DemoData::allowed(), 403);
         $n = DemoData::purge();
-        return back()->with('status', "Removed {$n} demo members and their demo records.");
+        return back()->with('status', "Removed seeded content ({$n} members).");
     }
 
     public function updateSubmission(Request $request, Submission $submission)

@@ -41,10 +41,15 @@ class Phase3Test extends TestCase
         $this->assertCount(5, $demo);
         foreach ($demo as $u) {
             $this->assertNotNull($u->email_verified_at);
-            $this->assertStringEndsWith('@demo.redstar.invalid', $u->email);
+            $this->assertMatchesRegularExpression('/^[a-z]+(?:\.[a-z]+)?\.gcu@collab\.name\.ng$/', $u->email);
             $this->assertContains($u->category, ['student', 'old_boy', 'teacher', 'friend']);
-            $this->assertFalse(Hash::check('password', $u->password));
+            $this->assertTrue(Hash::check(\App\Support\DemoData::PASSWORD, $u->password));
+            $this->assertSame('he/him', $u->pronouns);
+            $this->assertContains(explode(' ', $u->name)[0], \App\Support\DemoData::FIRST_NAMES);
+            $this->assertStringNotContainsString('demo', strtolower((string) $u->username));
         }
+        $this->assertTrue($demo->contains(fn ($u) => $u->admission_year === 1975));
+        $this->assertSame($demo->count(), $demo->pluck('email')->unique()->count());
         $this->assertSame(0, Submission::where('is_demo', true)->whereNotIn('user_id', $demo->pluck('id'))->count());
 
         // Re-seeding replaces, it does not accumulate.
@@ -54,6 +59,7 @@ class Phase3Test extends TestCase
         $this->actingAs($admin)->delete('/hq/demo')->assertRedirect();
         $this->assertSame(0, User::where('is_demo', true)->count());
         $this->assertSame(0, Submission::where('is_demo', true)->count() + Bookmark::where('is_demo', true)->count());
+        $this->assertSame(0, Edition::where('is_demo', true)->count());
         $this->assertModelExists($real);
         $this->assertModelExists($admin);
         $this->assertModelExists($realSub);

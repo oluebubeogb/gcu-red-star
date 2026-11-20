@@ -5,7 +5,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 const props = defineProps({ counts: Object, byCategory: Object, submissions: Array, editionStatus: Object, demo: Object });
 const demoCount = ref(25);
 const seedDemo = () => router.post(route('hq.demo.seed'), { count: demoCount.value }, { preserveScroll: true });
-const purgeDemo = () => confirm('Remove all demo members, submissions and bookmarks?') && router.delete(route('hq.demo.purge'), { preserveScroll: true });
+const purgeDemo = () => confirm('Remove all seeded members, editions and related content?') && router.delete(route('hq.demo.purge'), { preserveScroll: true });
 const user = usePage().props.auth.user;
 const ai = usePage().props.ai || {};
 const runAssistant = (s) => router.post(route('hq.submissions.assistant', s.id), {}, { preserveScroll: true });
@@ -48,14 +48,14 @@ const setStatus = (s, status) => router.patch(route('hq.submissions.update', s.i
             </div>
         </div>
         <div v-if="user.is_admin" class="mt-4 rounded-2xl bg-white p-6 ring-1 ring-brown-soft/30">
-            <h2 class="font-display text-xl font-bold">Demo data</h2>
-            <p class="mt-1 text-sm text-ink/70">Creates dummy members (random passwords, <code>.invalid</code> emails) with sample submissions and bookmarks. Removal deletes only records flagged as demo. Currently {{ demo.count }} demo members.</p>
-            <p v-if="!demo.allowed" class="mt-3 text-sm font-semibold text-brown">Disabled in production. Set REDSTAR_ALLOW_DEMO=true to enable.</p>
+            <h2 class="font-display text-xl font-bold">Seed content</h2>
+            <p class="mt-1 text-sm text-ink/70">Adds up to 25 members with archive editions, photographs and community content. Removal deletes only records created here. Currently {{ demo.count }} seeded members.</p>
+            <p v-if="!demo.allowed" class="mt-3 text-sm font-semibold text-brown">Disabled in production until the seed tools are enabled in the environment.</p>
             <div class="mt-4 flex flex-wrap items-center gap-2">
                 <label class="text-sm font-semibold">Members</label>
                 <input v-model.number="demoCount" type="number" min="1" max="25" :disabled="!demo.allowed" class="w-20 rounded-lg border-brown-soft/60 py-1 text-sm" />
-                <button @click="seedDemo" :disabled="!demo.allowed" class="rounded-full bg-star px-4 py-2 text-sm font-semibold text-white disabled:opacity-40">Seed demo data</button>
-                <button @click="purgeDemo" :disabled="!demo.allowed || !demo.count" class="rounded-full px-4 py-2 text-sm font-semibold text-red-700 ring-1 ring-red-200 disabled:opacity-40">Remove demo data</button>
+                <button @click="seedDemo" :disabled="!demo.allowed" class="rounded-full bg-star px-4 py-2 text-sm font-semibold text-white disabled:opacity-40">Seed content</button>
+                <button @click="purgeDemo" :disabled="!demo.allowed || !demo.count" class="rounded-full px-4 py-2 text-sm font-semibold text-red-700 ring-1 ring-red-200 disabled:opacity-40">Remove seeded content</button>
             </div>
         </div>
         <h2 class="mt-10 font-display text-2xl font-bold">Submissions</h2>
@@ -66,7 +66,7 @@ const setStatus = (s, status) => router.patch(route('hq.submissions.update', s.i
                     <span><b>{{ s.title }}</b> <span class="text-xs text-ink/60">· {{ s.kind }} · {{ s.user?.name }}</span>
                         <span v-if="s.user?.category === 'friend'" class="ml-1 rounded-full bg-pink-soft px-2 py-0.5 text-[10px] font-bold uppercase text-star-800" title="Submitted by a Friend of GCU (not a student, teacher or old boy)">Friend of GCU</span>
                         <span v-if="s.ai_review?.spam_score >= 0.6" class="ml-1 rounded-full bg-star px-2 py-0.5 text-[10px] font-bold uppercase text-white" title="AI assistant thinks this may be spam or abusive">likely spam</span>
-                        <span v-if="s.is_demo" class="ml-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase text-gray-600">demo</span></span>
+                        <span v-if="s.is_demo" class="ml-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase text-gray-600">seeded</span></span>
                     <select :value="s.status" @click.stop @change="setStatus(s, $event.target.value)" class="rounded-full border-brown-soft/60 py-1 text-xs">
                         <option value="submitted">Submitted</option><option value="in_review">In review</option><option value="accepted">Accepted</option><option value="declined">Declined</option>
                     </select>

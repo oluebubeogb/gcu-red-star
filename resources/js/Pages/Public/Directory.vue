@@ -2,6 +2,7 @@
 import { reactive } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import SiteLayout from '@/Layouts/SiteLayout.vue';
+import Reveal from '@/Components/Reveal.vue';
 const props = defineProps({ businesses: Object, filters: Object, categories: Array, states: Array });
 const f = reactive({ q: props.filters.q || '', category: props.filters.category || '', state: props.filters.state || '' });
 const apply = () => router.get(route('directory'), Object.fromEntries(Object.entries(f).filter(([, v]) => v)), { preserveState: true });
@@ -26,7 +27,7 @@ const user = usePage().props.auth.user;
             </form>
             <p v-if="!businesses.data.length" class="mt-10 text-sm text-ink/60">No businesses match yet.</p>
             <div class="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <article v-for="b in businesses.data" :key="b.id" :class="b.featured ? 'ring-2 ring-star' : 'ring-1 ring-brown-soft/30'" class="rounded-2xl bg-white p-5">
+                <Reveal v-for="b in businesses.data" :key="b.id"><article :class="b.featured ? 'ring-2 ring-star' : 'ring-1 ring-brown-soft/30'" class="card-lift rounded-2xl bg-white p-5">
                     <div class="flex items-start gap-3">
                         <img v-if="b.logo" :src="b.logo" :alt="b.name" class="h-14 w-14 rounded-lg object-contain ring-1 ring-brown-soft/30" />
                         <div class="min-w-0">
@@ -44,7 +45,7 @@ const user = usePage().props.auth.user;
                     <p v-if="b.owner" class="mt-3 border-t border-milk pt-2 text-xs text-ink/60">Owner:
                         <Link v-if="b.owner.username" :href="route('members.show', b.owner.username)" class="font-semibold text-star">{{ b.owner.name }}</Link><span v-else>{{ b.owner.name }}</span>
                         <Link v-if="b.owner.admission_year" :href="route('sets.show', b.owner.admission_year)" class="ml-1 font-semibold hover:text-star">· Class of {{ b.owner.admission_year }}</Link></p>
-                </article>
+                </article></Reveal>
             </div>
             <div v-if="businesses.last_page > 1" class="mt-8 flex justify-center gap-2">
                 <Link v-for="l in businesses.links" :key="l.label" :href="l.url || '#'" v-html="l.label" :class="l.active ? 'bg-star text-white' : 'bg-white'" class="rounded-full px-3 py-1 text-sm ring-1 ring-brown-soft/30" />

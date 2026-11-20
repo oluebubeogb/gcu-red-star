@@ -9,16 +9,19 @@ const label = { student: 'Student', old_boy: 'Old Boy', teacher: 'Teacher / Staf
     <SiteLayout :title="member.name">
         <section class="mx-auto max-w-4xl px-5 py-14">
             <div class="flex flex-wrap items-center gap-5">
-                <span class="flex h-20 w-20 items-center justify-center rounded-full bg-star font-display text-3xl font-bold text-white">{{ member.name.charAt(0) }}</span>
+                <img v-if="member.avatar" :src="member.avatar" :alt="member.name" class="h-20 w-20 rounded-full object-cover ring-1 ring-brown-soft/30" />
+                <span v-else class="flex h-20 w-20 items-center justify-center rounded-full bg-star font-display text-3xl font-bold text-white">{{ member.name.charAt(0) }}</span>
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-brown">{{ label[member.category] || 'Member' }}</p>
                     <h1 class="font-display text-4xl font-extrabold">{{ member.name }}</h1>
                     <p class="mt-1 text-sm text-ink/60">@{{ member.username }}
+                        <template v-if="member.pronouns"> · {{ member.pronouns }}</template>
                         <template v-if="member.admission_year"> · <Link :href="route('sets.show', member.admission_year)" class="hover:text-star">Class of {{ member.admission_year }}</Link></template>
                         <template v-if="member.house"> · <Link :href="route('houses.show', member.house_slug)" class="hover:text-star">{{ member.house }}</Link></template>
                     </p>
                 </div>
             </div>
+            <p v-if="member.bio" class="mt-6 max-w-2xl font-serif text-lg leading-relaxed text-ink/80">{{ member.bio }}</p>
             <p v-if="isMe && !member.public" class="mt-6 rounded-xl bg-pink-soft p-3 text-sm">Your profile is private — only you and the editors can see this page. <Link :href="route('profile.edit')" class="font-semibold underline">Change</Link></p>
             <div class="mt-8 flex flex-wrap items-center gap-2">
                 <span v-for="b in contributions.badges" :key="b" class="rounded-full bg-star px-3 py-1 text-xs font-bold text-white">★ {{ b }}</span>

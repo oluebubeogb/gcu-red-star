@@ -27,6 +27,8 @@ const form = useForm({
     show_in_directory: user.show_in_directory ?? true,
     digest_opt_in: user.digest_opt_in ?? false,
     notify_email: user.notify_email ?? true,
+    bio: user.bio ?? '',
+    pronouns: user.pronouns ?? '',
 });
 </script>
 
@@ -106,6 +108,17 @@ const form = useForm({
                     <select id="house" v-model="form.house" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-star focus:ring-star">
                         <option value="">— None —</option><option v-for="h in houses" :key="h" :value="h">{{ h }}</option>
                     </select><InputError class="mt-2" :message="form.errors.house" /></div>
+            </div>
+
+            <div>
+                <InputLabel for="bio" value="Short biography" />
+                <textarea id="bio" v-model="form.bio" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-star focus:ring-star" placeholder="A few sentences about you, in the third person if you like." />
+                <InputError class="mt-2" :message="form.errors.bio" />
+            </div>
+            <div>
+                <InputLabel for="pronouns" value="Pronouns" />
+                <TextInput id="pronouns" type="text" class="mt-1 block w-full" v-model="form.pronouns" placeholder="he/him" />
+                <InputError class="mt-2" :message="form.errors.pronouns" />
             </div>
 
             <div class="space-y-2 text-sm text-ink/80">

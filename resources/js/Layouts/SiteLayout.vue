@@ -33,11 +33,11 @@ const year = new Date().getFullYear();
                 <div class="hidden items-center gap-3 md:flex">
                     <template v-if="page.props.auth.user">
                         <Link v-if="page.props.auth.user.is_editor" :href="route('hq.index')" class="text-sm font-semibold text-brown hover:text-star">HQ</Link>
-                        <Link :href="route('dashboard')" class="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-milk hover:bg-star">My Red Star</Link>
+                        <Link :href="route('dashboard')" class="btn-micro rounded-full bg-ink px-4 py-2 text-sm font-semibold text-milk hover:bg-star">My Red Star</Link>
                     </template>
                     <template v-else>
                         <Link :href="route('login')" class="text-sm font-semibold text-ink/75 hover:text-star">Sign in</Link>
-                        <Link :href="route('register')" class="rounded-full bg-star px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-star-700">Join free</Link>
+                        <Link :href="route('register')" class="btn-micro rounded-full bg-star px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-star-700">Join free</Link>
                     </template>
                 </div>
                 <button class="rounded-lg p-2 md:hidden" @click="open = !open" aria-label="Menu">
@@ -65,7 +65,9 @@ const year = new Date().getFullYear();
             <p v-if="page.props.flash?.status" class="rounded-xl bg-pink-soft px-4 py-3 text-sm font-semibold text-star-800">{{ page.props.flash.status }}</p>
             <p v-if="page.props.errors?.payment" class="rounded-xl bg-star px-4 py-3 text-sm font-semibold text-white">{{ page.props.errors.payment }}</p>
         </div>
-        <main><slot /></main>
+        <Transition name="page" mode="out-in">
+            <main :key="page.url"><slot /></main>
+        </Transition>
 
         <footer class="mt-24 bg-ink text-milk">
             <div class="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-[1.4fr_1fr_1fr]">

@@ -22,6 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name', 'username', 'email', 'password',
         'category', 'graduation_year', 'admission_year', 'current_class', 'house',
         'show_in_directory', 'digest_opt_in', 'notify_email',
+        'bio', 'avatar_path', 'pronouns',
     ];
 
     protected $appends = ['is_admin', 'is_editor'];
@@ -62,8 +63,11 @@ class User extends Authenticatable implements MustVerifyEmail
     /** Small public card (never email). */
     public function card(): array
     {
-        return $this->only(['id', 'name', 'username', 'category', 'admission_year', 'house'])
-            + ['public' => (bool) $this->show_in_directory];
+        return $this->only(['id', 'name', 'username', 'category', 'admission_year', 'house', 'bio', 'pronouns'])
+            + [
+                'public' => (bool) $this->show_in_directory,
+                'avatar' => $this->avatar_path ? app(\App\Storage\MagazineStorage::class)->url($this->avatar_path) : null,
+            ];
     }
 
     /**

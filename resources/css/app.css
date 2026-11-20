@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Tasteful motion. Disabled entirely when the visitor prefers reduced motion. */
+@layer utilities {
+    .will-reveal { opacity: 0; transform: translateY(14px); }
+    .is-revealed { opacity: 1; transform: none; transition: opacity .5s ease, transform .5s ease; }
+    .card-lift { transition: transform .2s ease, box-shadow .2s ease; }
+    .card-lift:hover, .card-lift:focus-visible { transform: translateY(-4px); box-shadow: 0 16px 32px -18px rgba(26, 18, 16, .45); }
+    .btn-micro { transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease, color .15s ease; }
+    .btn-micro:hover { transform: translateY(-1px); }
+    .btn-micro:active { transform: translateY(0) scale(.98); }
+    .skeleton {
+        background: linear-gradient(90deg, #e8ddd0 0%, #f7f0e6 45%, #e8ddd0 100%);
+        background-size: 200% 100%;
+        animation: shimmer 1.2s ease-in-out infinite;
+        border-radius: .75rem;
+    }
+}
+
+.page-enter-active, .page-leave-active { transition: opacity .22s ease, transform .22s ease; }
+.page-enter-from { opacity: 0; transform: translateY(8px); }
+.page-leave-to { opacity: 0; transform: translateY(-6px); }
+
+.page-turn-enter-active, .page-turn-leave-active { transition: opacity .28s ease, transform .28s ease; }
+.page-turn-enter-from { opacity: 0; transform: translateX(28px); }
+.page-turn-leave-to { opacity: 0; transform: translateX(-28px); }
+
+@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+    .will-reveal, .is-revealed { opacity: 1; transform: none; transition: none; }
+    .card-lift, .card-lift:hover, .card-lift:focus-visible, .btn-micro, .btn-micro:hover, .btn-micro:active { transform: none; transition: none; }
+    .page-enter-active, .page-leave-active, .page-turn-enter-active, .page-turn-leave-active, .page-enter-from, .page-leave-to, .page-turn-enter-from, .page-turn-leave-to { transition: none; opacity: 1; transform: none; }
+    .skeleton { animation: none; }
+}

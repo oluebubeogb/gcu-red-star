@@ -19,6 +19,7 @@ const mode = ref('pages');
 const current = computed(() => props.pages.find((p) => p.n === page.value));
 const currentBlocks = computed(() => props.blocks?.[page.value] || []);
 const bookmark = computed(() => props.bookmarks.find((b) => b.page_number === page.value));
+const imageReady = ref(false);
 
 const go = (n) => { page.value = Math.min(Math.max(1, n), total.value); };
 const pageShareUrl = computed(() => `${props.shareUrl}?page=${page.value}`);
@@ -37,6 +38,7 @@ const toggleOffline = async () => {
     saving.value = 0; saved.value = true;
 };
 watch(page, (n) => {
+    imageReady.value = false;
     const url = new URL(window.location.href); url.searchParams.set('page', n);
     window.history.replaceState(window.history.state, '', url);
     window.scrollTo({ top: document.getElementById('reader')?.offsetTop - 80 || 0, behavior: 'smooth' });
@@ -155,8 +157,15 @@ const toggleBookmark = () => bookmark.value
                 <p v-if="pageSummary" class="rounded-2xl bg-milk px-4 py-2 text-sm text-ink/75 ring-1 ring-brown-soft/30"><b>Pages {{ pageSummary.from }}–{{ pageSummary.to }}:</b> {{ pageSummary.summary }}</p>
             </div>
             <div v-if="mode === 'pages'" class="mt-6 flex justify-center">
-                <img v-if="current?.image_url" :key="page" :src="current.image_url" :alt="`${edition.title}, page ${page}`"
-                     :width="current.width" :height="current.height" loading="lazy" decoding="async" class="h-auto max-w-full rounded-lg bg-white shadow-xl ring-1 ring-brown-soft/30" />
+                <div v-if="current?.image_url" class="relative w-full max-w-3xl">
+                    <div v-if="!imageReady" class="skeleton absolute inset-0 min-h-[60vh] rounded-lg" aria-hidden="true"></div>
+                    <Transition name="page-turn" mode="out-in">
+                        <img :key="page" :src="current.image_url" :alt="`${edition.title}, page ${page}`"
+                             :width="current.width" :height="current.height" loading="lazy" decoding="async"
+                             class="h-auto max-w-full rounded-lg bg-white shadow-xl ring-1 ring-brown-soft/30"
+                             @load="imageReady = true" />
+                    </Transition>
+                </div>
                 <p v-else class="rounded-2xl bg-white p-6 text-sm text-ink/60 ring-1 ring-brown-soft/30">No preview for this page.</p>
             </div>
             <article v-else class="mx-auto mt-6 max-w-2xl rounded-2xl bg-white px-6 py-8 ring-1 ring-brown-soft/30 md:px-10">

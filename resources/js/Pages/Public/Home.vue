@@ -6,6 +6,7 @@ import EmptyState from '@/Components/EmptyState.vue';
 import StarMark from '@/Components/StarMark.vue';
 import Countdown from '@/Components/Countdown.vue';
 import AdCard from '@/Components/AdCard.vue';
+import Reveal from '@/Components/Reveal.vue';
 defineProps({ latest: Array, stats: Object, homecoming: Object, feature: Object, announcements: Array, banner: Object, notices: { type: Array, default: () => [] } });
 const user = usePage().props.auth.user;
 const pillars = [
@@ -28,9 +29,9 @@ const pillars = [
                     <p class="mt-4 font-display text-xl italic text-milk/90 md:text-2xl">The Voice of Government College Umuahia</p>
                     <p class="mt-6 max-w-xl font-serif text-lg text-milk/85">A digital home for every edition — read on any device, search the archive, and contribute to the next issue.</p>
                     <div class="mt-8 flex flex-wrap gap-3">
-                        <Link :href="route('editions.index')" class="rounded-full bg-milk px-6 py-3 text-sm font-bold text-star shadow hover:bg-white">Browse editions</Link>
-                        <Link v-if="!user" :href="route('register')" class="rounded-full border border-white/40 px-6 py-3 text-sm font-bold text-white hover:bg-white/10">Join free</Link>
-                        <Link v-else :href="route('contribute')" class="rounded-full border border-white/40 px-6 py-3 text-sm font-bold text-white hover:bg-white/10">Contribute</Link>
+                        <Link :href="route('editions.index')" class="btn-micro rounded-full bg-milk px-6 py-3 text-sm font-bold text-star shadow hover:bg-white">Browse editions</Link>
+                        <Link v-if="!user" :href="route('register')" class="btn-micro rounded-full border border-white/40 px-6 py-3 text-sm font-bold text-white hover:bg-white/10">Join free</Link>
+                        <Link v-else :href="route('contribute')" class="btn-micro rounded-full border border-white/40 px-6 py-3 text-sm font-bold text-white hover:bg-white/10">Contribute</Link>
                     </div>
                 </div>
                 <div class="hidden justify-center md:flex">
@@ -66,12 +67,12 @@ const pillars = [
         <section v-if="notices.length" class="mx-auto max-w-6xl px-5 pt-10">
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-brown">Notices</p>
             <div class="mt-3 grid gap-3 md:grid-cols-2">
-                <div v-for="n in notices" :key="n.id" :class="n.kind === 'obituary' ? 'bg-ink text-milk' : 'bg-white'" class="flex gap-4 rounded-2xl p-4 ring-1 ring-brown-soft/30">
+                <Reveal v-for="n in notices" :key="n.id"><div :class="n.kind === 'obituary' ? 'bg-ink text-milk' : 'bg-white'" class="card-lift flex gap-4 rounded-2xl p-4 ring-1 ring-brown-soft/30">
                     <img v-if="n.image" :src="n.image" :alt="n.title" class="h-20 w-20 rounded-lg object-cover" />
                     <div><p class="text-[10px] font-semibold uppercase tracking-[0.2em] opacity-60">{{ n.kind === 'obituary' ? 'In memoriam' : 'Congratulations' }} · from {{ n.advertiser }}</p>
                         <p class="font-display text-lg font-bold">{{ n.title }}</p><p v-if="n.body" class="text-sm opacity-80">{{ n.body }}</p>
                         <a v-if="n.url" :href="n.url" target="_blank" rel="noopener" class="text-xs font-semibold underline">More</a></div>
-                </div>
+                </div></Reveal>
             </div>
         </section>
 
@@ -84,7 +85,7 @@ const pillars = [
                 <Link :href="route('editions.index')" class="text-sm font-semibold text-star hover:underline">All editions →</Link>
             </div>
             <div v-if="latest.length" class="mt-8 grid grid-cols-2 gap-6 md:grid-cols-4">
-                <EditionCard v-for="e in latest" :key="e.id" :edition="e" />
+                <Reveal v-for="e in latest" :key="e.id"><EditionCard :edition="e" /></Reveal>
             </div>
             <EmptyState v-else class="mt-8" title="The first digital edition is on its way"
                 body="The editorial team is preparing The Red Star's first online issue and digitising past editions. Join free to be notified when it lands.">
@@ -93,13 +94,16 @@ const pillars = [
         </section>
 
         <section v-if="feature || announcements.length" class="mx-auto grid max-w-6xl gap-6 px-5 pb-16 md:grid-cols-2">
-            <div v-if="feature" class="rounded-3xl bg-white p-8 ring-1 ring-brown-soft/30">
+            <Reveal v-if="feature"><div class="rounded-3xl bg-white p-8 ring-1 ring-brown-soft/30">
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-brown">Old Boy of the month · {{ feature.month }}</p>
-                <h3 class="mt-2 font-display text-2xl font-bold">{{ feature.member.name }}</h3>
+                <div class="mt-3 flex items-center gap-4">
+                    <img v-if="feature.member.avatar" :src="feature.member.avatar" :alt="feature.member.name" class="h-16 w-16 rounded-full object-cover" />
+                    <h3 class="font-display text-2xl font-bold">{{ feature.member.name }}</h3>
+                </div>
                 <p class="text-sm text-ink/60"><span v-if="feature.member.admission_year">Set of {{ feature.member.admission_year }}</span><span v-if="feature.member.house"> · {{ feature.member.house }}</span></p>
                 <p class="mt-4 whitespace-pre-line font-serif text-ink/80">{{ feature.blurb }}</p>
                 <Link v-if="feature.member.public" :href="route('members.show', feature.member.username)" class="mt-4 inline-block text-sm font-semibold text-star">View profile →</Link>
-            </div>
+            </div></Reveal>
             <div v-if="announcements.length" class="rounded-3xl bg-white p-8 ring-1 ring-brown-soft/30">
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-brown">Announcements</p>
                 <div v-for="a in announcements" :key="a.id" class="mt-4 border-t border-milk pt-4 first:border-0 first:pt-0">

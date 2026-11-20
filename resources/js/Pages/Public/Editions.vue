@@ -3,6 +3,7 @@ import { Link } from '@inertiajs/vue3';
 import SiteLayout from '@/Layouts/SiteLayout.vue';
 import EditionCard from '@/Components/EditionCard.vue';
 import EmptyState from '@/Components/EmptyState.vue';
+import Reveal from '@/Components/Reveal.vue';
 defineProps({ editions: Object });
 </script>
 <template>
@@ -12,7 +13,7 @@ defineProps({ editions: Object });
             <h1 class="mt-2 font-display text-4xl font-extrabold md:text-5xl">Editions</h1>
             <p class="mt-3 max-w-2xl font-serif text-lg text-ink/70">Every issue, readable on your phone in Comfort Reading or as the original printed magazine.</p>
             <div v-if="editions.data.length" class="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
-                <EditionCard v-for="e in editions.data" :key="e.id" :edition="e" />
+                <Reveal v-for="e in editions.data" :key="e.id"><EditionCard :edition="e" /></Reveal>
             </div>
             <EmptyState v-else class="mt-10" title="No editions published yet"
                 body="Editions will appear here as soon as the editorial team publishes them. Members get notified first." />
