@@ -20,7 +20,8 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $fillable = [
         'name', 'username', 'email', 'password',
-        'category', 'graduation_year', 'current_class', 'house',
+        'category', 'graduation_year', 'admission_year', 'current_class', 'house',
+        'show_in_directory', 'digest_opt_in', 'notify_email',
     ];
 
     protected $appends = ['is_admin', 'is_editor'];
@@ -42,6 +43,28 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getIsEditorAttribute(): bool { return $this->isEditor(); }
 
     public function submissions() { return $this->hasMany(Submission::class); }
+    public function businesses() { return $this->hasMany(Business::class); }
+    public function bookmarks() { return $this->hasMany(Bookmark::class); }
+    public function tags() { return $this->hasMany(PageTag::class); }
+
+    /** Listed on public set/house pages and /members/{username}. */
+    public function scopeDirectory($q)
+    {
+        return $q->where('show_in_directory', true)->whereNotNull('email_verified_at');
+    }
+
+    public function profileVisibleTo(?User $viewer): bool
+    {
+        return ($this->show_in_directory && $this->hasVerifiedEmail())
+            || ($viewer && ($viewer->id === $this->id || $viewer->isEditor()));
+    }
+
+    /** Small public card (never email). */
+    public function card(): array
+    {
+        return $this->only(['id', 'name', 'username', 'category', 'admission_year', 'house'])
+            + ['public' => (bool) $this->show_in_directory];
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -63,6 +86,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_demo' => 'boolean',
+            'show_in_directory' => 'boolean',
+            'digest_opt_in' => 'boolean',
+            'notify_email' => 'boolean',
         ];
     }
 }

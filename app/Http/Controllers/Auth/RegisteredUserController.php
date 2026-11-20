@@ -22,6 +22,7 @@ class RegisteredUserController extends Controller
     public function create(): Response
     {
         return Inertia::render('Auth/Register', [
+            'houses' => \App\Support\Roles::HOUSES,
             'categories' => collect(\App\Support\Roles::SELF_SERVE)->map(fn ($k) => ['value' => $k, 'label' => \App\Support\Roles::CATEGORIES[$k]])->values(),
         ]);
     }
@@ -41,7 +42,11 @@ class RegisteredUserController extends Controller
             'category' => ['required', 'in:'.implode(',', \App\Support\Roles::SELF_SERVE)],
             'graduation_year' => ['nullable', 'integer', 'min:1929', 'max:'.(now()->year + 7)],
             'current_class' => ['nullable', 'string', 'max:40'],
+            'admission_year' => ['nullable', 'integer', 'min:1929', 'max:'.now()->year],
+            'house' => ['nullable', \Illuminate\Validation\Rule::in(\App\Support\Roles::HOUSES)],
+            'digest_opt_in' => ['nullable', 'boolean'],
         ]);
+        $school = in_array($request->category, \App\Support\Roles::SCHOOL, true);
 
         $user = User::create([
             'name' => $request->name,
@@ -49,7 +54,10 @@ class RegisteredUserController extends Controller
             'username' => strtolower($request->username),
             'password' => Hash::make($request->password),
             'category' => $request->category,
-            'graduation_year' => $request->graduation_year,
+            'graduation_year' => $school ? $request->graduation_year : null,
+            'admission_year' => $school || $request->category === 'teacher' ? $request->admission_year : null,
+            'house' => $school ? $request->house : null,
+            'digest_opt_in' => $request->boolean('digest_opt_in'),
             'current_class' => $request->category === 'student' ? $request->current_class : null,
         ]);
 

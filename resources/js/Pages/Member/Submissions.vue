@@ -3,8 +3,8 @@ import { Head, useForm } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import InputError from '@/Components/InputError.vue';
 defineProps({ submissions: Array });
-const form = useForm({ title: '', kind: 'article', body: '' });
-const submit = () => form.post(route('submissions.store'), { preserveScroll: true, onSuccess: () => form.reset() });
+const form = useForm({ title: '', kind: 'article', body: '', photo: null });
+const submit = () => form.post(route('submissions.store'), { preserveScroll: true, forceFormData: true, onSuccess: () => form.reset() });
 const tone = { submitted: 'bg-milk text-brown', in_review: 'bg-pink-soft text-star-800', accepted: 'bg-green-100 text-green-800', declined: 'bg-gray-100 text-gray-600' };
 </script>
 <template>
@@ -25,8 +25,13 @@ const tone = { submitted: 'bg-milk text-brown', in_review: 'bg-pink-soft text-st
                         <option value="photo">Photo essay</option><option value="letter">Old boy's letter</option><option value="news">House / school news</option>
                     </select>
                 </div>
+                <div v-if="form.kind === 'photo'">
+                    <label class="text-sm font-semibold">Photo (JPG, PNG or WebP, max 10 MB)</label>
+                    <input type="file" accept="image/jpeg,image/png,image/webp" @input="form.photo = $event.target.files[0]" class="mt-1 block w-full text-sm" />
+                    <InputError :message="form.errors.photo" />
+                </div>
                 <div>
-                    <label class="text-sm font-semibold">Your piece</label>
+                    <label class="text-sm font-semibold">{{ form.kind === 'photo' ? 'Caption / story (optional)' : 'Your piece' }}</label>
                     <textarea v-model="form.body" rows="10" class="mt-1 w-full rounded-lg border-brown-soft/60 font-serif focus:border-star focus:ring-star"></textarea>
                     <InputError :message="form.errors.body" />
                 </div>

@@ -30,6 +30,11 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
 
+        // Ask the archive: per user when signed in, per IP for guests (cost control).
+        \Illuminate\Support\Facades\RateLimiter::for('ask', fn (\Illuminate\Http\Request $r) => $r->user()
+            ? \Illuminate\Cache\RateLimiting\Limit::perHour(config('ai.ask_user_per_hour'))->by('u'.$r->user()->id)
+            : \Illuminate\Cache\RateLimiting\Limit::perHour(config('ai.ask_guest_per_hour'))->by('ip'.$r->ip()));
+
         \Illuminate\Support\Facades\Gate::define('admin', fn ($u) => $u->isAdmin());
         \Illuminate\Support\Facades\Gate::define('editorial', fn ($u) => $u->isEditor());
     }

@@ -14,10 +14,12 @@ class FileController extends Controller
         $stream = $storage->readStream($key);
         $mime = match (strtolower(pathinfo($key, PATHINFO_EXTENSION))) {
             'pdf' => 'application/pdf', 'png' => 'image/png', 'webp' => 'image/webp',
-            'jpg', 'jpeg' => 'image/jpeg', default => 'application/octet-stream',
+            'jpg', 'jpeg' => 'image/jpeg', 'mp3' => 'audio/mpeg', 'wav' => 'audio/wav', default => 'application/octet-stream',
         };
+        // Signed URLs carry the file version (`v`), so images can be cached hard; PDFs stay short.
+        $cache = str_starts_with($mime, 'image/') || str_starts_with($mime, 'audio/') ? 'private, max-age=604800, immutable' : 'private, max-age=3600';
         return response()->stream(function () use ($stream) { fpassthru($stream); }, 200, [
-            'Content-Type' => $mime, 'Cache-Control' => 'private, max-age=3600',
+            'Content-Type' => $mime, 'Cache-Control' => $cache, 'X-Content-Type-Options' => 'nosniff',
         ]);
     }
 }

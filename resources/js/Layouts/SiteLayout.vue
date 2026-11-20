@@ -9,7 +9,10 @@ const page = usePage();
 const open = ref(false);
 const nav = [
     { label: 'Editions', route: 'editions.index' },
-    { label: 'Archive', route: 'archive' },
+    { label: 'Search', route: 'search' },
+    ...(page.props.ai?.ask ? [{ label: 'Ask', route: 'ask' }] : []),
+    { label: 'Sets', route: 'sets.index' },
+    { label: 'Homecoming', route: 'homecoming' },
     { label: 'Contribute', route: 'contribute' },
     { label: 'About', route: 'about' },
 ];
@@ -22,7 +25,7 @@ const year = new Date().getFullYear();
         <header class="sticky top-0 z-40 border-b border-brown-soft/30 bg-milk/90 backdrop-blur">
             <div class="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
                 <Wordmark compact />
-                <nav class="hidden items-center gap-7 md:flex">
+                <nav class="hidden items-center gap-5 md:flex">
                     <Link v-for="n in nav" :key="n.route" :href="route(n.route)"
                           :class="route().current(n.route) ? 'text-star' : 'text-ink/75 hover:text-star'"
                           class="text-sm font-semibold transition">{{ n.label }}</Link>
@@ -58,6 +61,10 @@ const year = new Date().getFullYear();
             </div>
         </header>
 
+        <div v-if="page.props.flash?.status || page.props.errors?.payment" class="mx-auto mt-4 max-w-5xl px-5">
+            <p v-if="page.props.flash?.status" class="rounded-xl bg-pink-soft px-4 py-3 text-sm font-semibold text-star-800">{{ page.props.flash.status }}</p>
+            <p v-if="page.props.errors?.payment" class="rounded-xl bg-star px-4 py-3 text-sm font-semibold text-white">{{ page.props.errors.payment }}</p>
+        </div>
         <main><slot /></main>
 
         <footer class="mt-24 bg-ink text-milk">
@@ -71,6 +78,10 @@ const year = new Date().getFullYear();
                     <ul class="mt-4 space-y-2 text-sm text-milk/80">
                         <li><Link :href="route('editions.index')" class="hover:text-white">Editions</Link></li>
                         <li><Link :href="route('archive')" class="hover:text-white">Archive</Link></li>
+                        <li><Link :href="route('houses.index')" class="hover:text-white">Houses</Link></li>
+                        <li><Link :href="route('directory')" class="hover:text-white">Alumni businesses</Link></li>
+                        <li><Link :href="route('sponsor.index')" class="hover:text-white">Sponsor</Link></li>
+                        <li><Link :href="route('advertise')" class="hover:text-white">Advertise & notices</Link></li>
                     </ul>
                 </div>
                 <div>

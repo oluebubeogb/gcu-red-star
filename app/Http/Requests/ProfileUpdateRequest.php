@@ -20,7 +20,11 @@ class ProfileUpdateRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'graduation_year' => ['nullable', 'integer', 'min:1929', 'max:'.(now()->year + 7)],
             'current_class' => ['nullable', 'string', 'max:40'],
-            'house' => ['nullable', 'string', 'max:60'],
+            'admission_year' => ['nullable', 'integer', 'min:1929', 'max:'.now()->year],
+            'house' => ['nullable', Rule::in(\App\Support\Roles::HOUSES)],
+            'show_in_directory' => ['boolean'],
+            'digest_opt_in' => ['boolean'],
+            'notify_email' => ['boolean'],
             'email' => [
                 'required',
                 'string',

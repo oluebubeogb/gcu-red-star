@@ -1,0 +1,10 @@
+{
+  "name": "The Red Star",
+  "short_name": "Red Star",
+  "description": "The voice of Government College Umuahia",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F0E8",
+  "theme_color": "#A52A2A",
+  "icons": [{ "src": "/gcu-badge.png", "sizes": "120x120", "type": "image/png" }]
+}

@@ -4,7 +4,9 @@ import SiteLayout from '@/Layouts/SiteLayout.vue';
 import EditionCard from '@/Components/EditionCard.vue';
 import EmptyState from '@/Components/EmptyState.vue';
 import StarMark from '@/Components/StarMark.vue';
-defineProps({ latest: Array, stats: Object });
+import Countdown from '@/Components/Countdown.vue';
+import AdCard from '@/Components/AdCard.vue';
+defineProps({ latest: Array, stats: Object, homecoming: Object, feature: Object, announcements: Array, banner: Object, notices: { type: Array, default: () => [] } });
 const user = usePage().props.auth.user;
 const pillars = [
     { t: 'Comfort Reading', d: 'On your phone, every article flows in one clean column — no pinch-zooming, no sideways scrolling.' },
@@ -45,6 +47,34 @@ const pillars = [
             </div>
         </section>
 
+        <section class="bg-ink text-milk">
+            <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6 px-5 py-8">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-pink">GCUOBA Homecoming {{ homecoming.year }} · Golden Jubilee</p>
+                    <h2 class="mt-1 font-display text-2xl font-bold md:text-3xl">Class of {{ homecoming.set }} — 50 years since admission</h2>
+                    <p v-if="homecoming.event?.starts_on" class="mt-1 text-sm text-milk/70">{{ new Date(homecoming.event.starts_on).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' }) }}<span v-if="homecoming.event.venue"> · {{ homecoming.event.venue }}</span></p>
+                </div>
+                <div class="flex flex-wrap items-center gap-4">
+                    <Countdown v-if="homecoming.event?.starts_on" :date="homecoming.event.starts_on" />
+                    <Link :href="route('homecoming')" class="rounded-full bg-star px-5 py-2.5 text-sm font-bold text-white hover:bg-star-700">Homecoming →</Link>
+                </div>
+            </div>
+        </section>
+
+        <section v-if="banner" class="mx-auto max-w-6xl px-5 pt-10"><AdCard :ad="banner" banner /></section>
+
+        <section v-if="notices.length" class="mx-auto max-w-6xl px-5 pt-10">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-brown">Notices</p>
+            <div class="mt-3 grid gap-3 md:grid-cols-2">
+                <div v-for="n in notices" :key="n.id" :class="n.kind === 'obituary' ? 'bg-ink text-milk' : 'bg-white'" class="flex gap-4 rounded-2xl p-4 ring-1 ring-brown-soft/30">
+                    <img v-if="n.image" :src="n.image" :alt="n.title" class="h-20 w-20 rounded-lg object-cover" />
+                    <div><p class="text-[10px] font-semibold uppercase tracking-[0.2em] opacity-60">{{ n.kind === 'obituary' ? 'In memoriam' : 'Congratulations' }} · from {{ n.advertiser }}</p>
+                        <p class="font-display text-lg font-bold">{{ n.title }}</p><p v-if="n.body" class="text-sm opacity-80">{{ n.body }}</p>
+                        <a v-if="n.url" :href="n.url" target="_blank" rel="noopener" class="text-xs font-semibold underline">More</a></div>
+                </div>
+            </div>
+        </section>
+
         <section class="mx-auto max-w-6xl px-5 py-16">
             <div class="flex items-end justify-between gap-4">
                 <div>
@@ -60,6 +90,23 @@ const pillars = [
                 body="The editorial team is preparing The Red Star's first online issue and digitising past editions. Join free to be notified when it lands.">
                 <Link :href="route('register')" class="rounded-full bg-star px-5 py-2.5 text-sm font-semibold text-white">Join free</Link>
             </EmptyState>
+        </section>
+
+        <section v-if="feature || announcements.length" class="mx-auto grid max-w-6xl gap-6 px-5 pb-16 md:grid-cols-2">
+            <div v-if="feature" class="rounded-3xl bg-white p-8 ring-1 ring-brown-soft/30">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-brown">Old Boy of the month · {{ feature.month }}</p>
+                <h3 class="mt-2 font-display text-2xl font-bold">{{ feature.member.name }}</h3>
+                <p class="text-sm text-ink/60"><span v-if="feature.member.admission_year">Set of {{ feature.member.admission_year }}</span><span v-if="feature.member.house"> · {{ feature.member.house }}</span></p>
+                <p class="mt-4 whitespace-pre-line font-serif text-ink/80">{{ feature.blurb }}</p>
+                <Link v-if="feature.member.public" :href="route('members.show', feature.member.username)" class="mt-4 inline-block text-sm font-semibold text-star">View profile →</Link>
+            </div>
+            <div v-if="announcements.length" class="rounded-3xl bg-white p-8 ring-1 ring-brown-soft/30">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-brown">Announcements</p>
+                <div v-for="a in announcements" :key="a.id" class="mt-4 border-t border-milk pt-4 first:border-0 first:pt-0">
+                    <h3 class="font-display text-lg font-bold">{{ a.title }}</h3>
+                    <p class="mt-1 line-clamp-3 whitespace-pre-line font-serif text-ink/75">{{ a.body }}</p>
+                </div>
+            </div>
         </section>
 
         <section class="bg-white">

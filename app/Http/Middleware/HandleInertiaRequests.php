@@ -33,12 +33,15 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+                'unread' => fn () => $request->user()?->unreadNotifications()->count() ?? 0,
             ],
             'brand' => [
                 'name' => 'The Red Star',
                 'tagline' => config('redstar.tagline'),
                 'institution' => config('redstar.institution'),
             ],
+            'payments' => fn () => app(\App\Payments\Payments::class)->enabled(),
+            'ai' => fn () => app(\App\Ai\Ai::class)->flags(),
             'flash' => ['status' => fn () => $request->session()->get('status')],
         ];
     }

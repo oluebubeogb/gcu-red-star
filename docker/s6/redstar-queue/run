@@ -4,4 +4,4 @@
 if [ "${REDSTAR_RUN_WORKERS:-true}" != "true" ]; then exec sleep infinity; fi
 sleep "${REDSTAR_WORKER_START_DELAY:-20}"   # let the boot hook finish migrations
 cd /var/www/html
-exec php artisan queue:work --sleep=3 --tries=3 --timeout=300 --max-time=3600
+exec php artisan queue:work --sleep=3 --tries=3 --timeout=900 --max-time=3600

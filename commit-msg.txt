@@ -1,0 +1,38 @@
+feat: Phases 2–6 — reader, PDF worker, community, AI and commerce
+
+Phase 2 – Editions & reader
+- HQ edition management: PDF/cover upload, processing statuses, publish/unpublish
+- Python PDF worker (PyMuPDF + Tesseract OCR): page previews, text extraction, Comfort Reading blocks
+- Edition reader with original-page and Comfort Reading views
+- Postgres full-text search, member bookmarks, signed PDF downloads
+- Photo submissions
+
+Phase 3 – Foundations
+- One-click demo data seed/remove (up to 25 users, flagged is_demo, blocked in production)
+- "Friend of GCU" category for outside sign-ups; guests = non-logged-in visitors
+- Typo-tolerant search with pg_trgm and "did you mean"
+- Low-bandwidth: lazy images, long-cache previews, offline editions, WhatsApp sharing, OG previews
+
+Phase 4 – Community
+- Fixed GCU house list (dropdown + data cleanup)
+- Sets keyed by year of admission; set and house pages
+- People tagging with notifications; public member profiles with privacy toggle
+- Homecoming / Golden Jubilee (admission year + 50), seeded with Class of 1975 (Dec 2025)
+- HQ announcements, Old Boy of the month, monthly digest email, student contributor badges
+
+Phase 5 – AI (Replicate)
+- Semantic search (embeddings, pgvector with JSON fallback)
+- Ask the archive, open to all, answers cited to edition + page
+- Summaries and auto-tags with editor review, OCR cleanup, audio editions
+- Editor's assistant for submissions; HQ AI controls and daily cap
+
+Phase 6 – Commerce
+- Payment gateway switch via PAYMENT_METHOD (Monnify or Paystack), verified webhooks
+- Sponsorships, alumni business directory with featured listings
+- Ads and congratulatory/obituary notices, printed copy orders
+- Bulk upload of archive editions, HQ revenue dashboard with CSV export
+
+Infra
+- DATABASE_URL and REDIS_URL support for app and worker
+- New env vars documented in .env.example and README
+- 65 feature tests passing

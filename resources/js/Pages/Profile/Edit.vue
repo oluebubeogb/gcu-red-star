@@ -12,6 +12,7 @@ defineProps({
     status: {
         type: String,
     },
+    houses: Array,
 });
 </script>
 
@@ -33,6 +34,7 @@ defineProps({
                     class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
                 >
                     <UpdateProfileInformationForm
+                        :houses="houses"
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
                         class="max-w-xl"

@@ -5,6 +5,8 @@ const page = usePage();
 const tabs = [
     { label: 'Overview', route: 'dashboard' },
     { label: 'My submissions', route: 'submissions.index' },
+    { label: 'Bookmarks', route: 'bookmarks.index' },
+    { label: 'Notifications', route: 'notifications.index', badge: 'unread' },
     { label: 'Profile', route: 'profile.edit' },
 ];
 </script>
@@ -15,13 +17,16 @@ const tabs = [
                 <nav class="flex gap-1 overflow-x-auto">
                     <Link v-for="t in tabs" :key="t.route" :href="route(t.route)"
                           :class="route().current(t.route) ? 'bg-star text-white' : 'text-ink/70 hover:bg-milk'"
-                          class="whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold">{{ t.label }}</Link>
+                          class="whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold">{{ t.label }}<span v-if="t.badge && page.props.auth.unread" class="ml-1 rounded-full bg-pink px-1.5 text-[10px] text-ink">{{ page.props.auth.unread }}</span></Link>
                     <Link v-if="page.props.auth.user?.is_editor" :href="route('hq.index')"
                           :class="route().current('hq.*') ? 'bg-brown text-white' : 'text-brown hover:bg-milk'"
                           class="whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold">Editorial HQ</Link>
                 </nav>
                 <Link :href="route('logout')" method="post" as="button" class="text-sm font-semibold text-ink/60 hover:text-star">Sign out</Link>
             </div>
+        </div>
+        <div v-if="page.props.errors?.payment" class="mx-auto mt-6 max-w-6xl px-5">
+            <div class="rounded-xl bg-star px-4 py-3 text-sm font-semibold text-white">{{ page.props.errors.payment }}</div>
         </div>
         <div v-if="page.props.flash?.status" class="mx-auto mt-6 max-w-6xl px-5">
             <div class="rounded-xl bg-pink-soft px-4 py-3 text-sm font-semibold text-star-800">{{ page.props.flash.status }}</div>

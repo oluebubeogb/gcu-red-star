@@ -16,7 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        //
+        // Payment webhooks have no CSRF token; they are authenticated by HMAC signature instead.
+        $middleware->validateCsrfTokens(except: ['payments/webhook', 'payments/webhook/monnify']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
