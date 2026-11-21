@@ -163,7 +163,7 @@ const toggleBookmark = () => bookmark.value
                         <img :key="page" :src="current.image_url" :alt="`${edition.title}, page ${page}`"
                              :width="current.width" :height="current.height" loading="lazy" decoding="async"
                              class="h-auto max-w-full rounded-lg bg-white shadow-xl ring-1 ring-brown-soft/30"
-                             @load="imageReady = true" />
+                             @load="imageReady = true" @error="imageReady = true" />
                     </Transition>
                 </div>
                 <p v-else class="rounded-2xl bg-white p-6 text-sm text-ink/60 ring-1 ring-brown-soft/30">No preview for this page.</p>

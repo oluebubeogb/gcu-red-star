@@ -26,8 +26,10 @@ class AppServiceProvider extends ServiceProvider
         // SMTP the Paddy/Neaby way: IPv4-first connect + port-driven TLS.
         \Illuminate\Support\Facades\Mail::extend('smtp', fn (array $config) => \App\Mail\SmtpTransportFactory::make($config));
 
-        if ($this->app->environment('production') && str_starts_with((string) config('app.url'), 'https://')) {
+        $root = rtrim((string) config('app.url'), '/');
+        if (str_starts_with($root, 'https://')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
+            \Illuminate\Support\Facades\URL::forceRootUrl($root);
         }
 
         // Ask the archive: per user when signed in, per IP for guests (cost control).

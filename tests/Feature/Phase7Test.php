@@ -10,6 +10,7 @@ use App\Support\DemoData;
 use App\Support\Roles;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\URL;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
@@ -163,6 +164,61 @@ class Phase7Test extends TestCase
         $this->assertStringContainsString('>seeded</span>', $members);
         $this->assertStringNotContainsString('Real + demo', $members);
         $this->assertStringNotContainsString('Demo only', $members);
+    }
+
+
+    public function test_signed_file_urls_work_behind_an_https_proxy(): void
+    {
+        $root = 'https://redstar.example';
+        config(['app.url' => $root]);
+        URL::forceScheme('https');
+        URL::forceRootUrl($root);
+
+        $storage = app(MagazineStorage::class);
+        $coverKey = 'seed/editions/homecoming-2025/cover.webp';
+        $pdfKey = 'seed/editions/homecoming-2025/edition.pdf';
+        $storage->put($coverKey, 'webp-bytes');
+        $storage->put($pdfKey, '%PDF-1.4 proxy-test');
+
+        $coverUrl = $storage->url($coverKey);
+        $this->assertStringContainsString('/files/'.$coverKey, $coverUrl);
+        $this->assertStringContainsString('signature=', $coverUrl);
+
+        // As the PHP container sees the request: HTTP + an internal host, public origin only in X-Forwarded-*.
+        $server = [
+            'HTTP_HOST' => '10.0.1.8:8080',
+            'HTTPS' => 'off',
+            'SERVER_PORT' => '8080',
+            'HTTP_X_FORWARDED_PROTO' => 'https',
+            'HTTP_X_FORWARDED_HOST' => 'redstar.example',
+            'HTTP_X_FORWARDED_PORT' => '443',
+            'HTTP_X_FORWARDED_FOR' => '81.2.3.4',
+            'REMOTE_ADDR' => '10.0.1.1',
+        ];
+        $this->call('GET', $coverUrl, server: $server)->assertOk()
+            ->assertHeader('Content-Type', 'image/webp');
+        $this->call('GET', $coverUrl, server: ['HTTP_HOST' => '127.0.0.1:8000', 'HTTPS' => 'off', 'SERVER_PORT' => '8000'])
+            ->assertOk();
+        $this->get('/files/'.$coverKey)->assertForbidden();
+
+        $edition = Edition::create([
+            'title' => 'Homecoming 2025', 'slug' => 'homecoming-2025-proxy', 'year' => 2025,
+            'access' => 'public', 'status' => 'published', 'published_at' => now()->subDay(),
+            'processing_status' => 'ready', 'page_count' => 1,
+            'cover_path' => $coverKey, 'pdf_path' => $pdfKey,
+        ]);
+
+        $cover = $this->call('GET', '/editions/'.$edition->slug.'/cover', server: $server);
+        $cover->assertRedirect();
+        $this->call('GET', $cover->headers->get('Location'), server: $server)->assertOk()
+            ->assertHeader('Content-Type', 'image/webp');
+
+        $user = User::factory()->create(['username' => 'reader7']);
+        $download = $this->actingAs($user)->call('GET', '/editions/'.$edition->slug.'/download', server: $server);
+        $download->assertRedirect();
+        $this->assertStringContainsString('/files/', (string) $download->headers->get('Location'));
+        $this->call('GET', $download->headers->get('Location'), server: $server)->assertOk()
+            ->assertHeader('Content-Type', 'application/pdf');
     }
 
     /** @return list<string> */

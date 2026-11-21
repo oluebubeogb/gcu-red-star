@@ -37,7 +37,8 @@ class FilesystemMagazineStorage implements MagazineStorage
         $ts = (int) (ceil($expires->getTimestamp() / $window) * $window);
         $params = ['key' => $key];
         try { $params['v'] = $this->fs()->lastModified($key); } catch (\Throwable) {}
-        return URL::temporarySignedRoute('files.show', \Illuminate\Support\Carbon::createFromTimestamp($ts), $params);
+        // Relative so the signature does not include scheme/host — those change behind a reverse proxy.
+        return URL::temporarySignedRoute('files.show', \Illuminate\Support\Carbon::createFromTimestamp($ts), $params, absolute: false);
     }
 
     public function url(string $key): string

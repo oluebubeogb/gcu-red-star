@@ -52,7 +52,7 @@ Route::get('/contribute', [PublicController::class, 'contribute'])->name('contri
 
 // Private magazine files (signed, short-lived)
 Route::get('/files/{key}', [FileController::class, 'show'])->where('key', '.*')
-    ->middleware('signed')->name('files.show');
+    ->middleware('signed:relative')->name('files.show');
 
 // Members
 Route::middleware(['auth', 'verified'])->group(function () {
